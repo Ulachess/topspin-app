@@ -793,7 +793,11 @@ let appData = {
 function loadData() {
   try {
     const raw = localStorage.getItem(DATA_KEY);
-    if (raw) appData = JSON.parse(raw);
+    if (raw) {
+      const saved = JSON.parse(raw);
+      appData = { ...appData, ...saved };
+    }
+    if (!appData.rttfRating) appData.rttfRating = 265;
   } catch(e) { showToast('Ошибка загрузки данных'); }
 }
 
