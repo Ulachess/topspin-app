@@ -1,4 +1,4 @@
-const CACHE = 'topspin-v1';
+const CACHE = 'topspin-v3';
 const ASSETS = [
   '/topspin-app/',
   '/topspin-app/index.html'
