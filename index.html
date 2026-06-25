@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0d1f17">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>ТопСпин</title>
+<style>
+:root {
+  --bg:      #dc2626;
+  --bg2:     #b91c1c;
+  --bg3:     #991b1b;
+  --card:    #fff;
+  --card2:   #fff5f5;
+  --border:  #fecaca;
+  --text:    #1a1a1a;
+  --text2:   #6b7280;
+  --text3:   #9ca3af;
+  --accent:  #dc2626;
+  --accent2: #ef4444;
+  --green:   #4ade80;
+  --green2:  #22c55e;
+  --yellow:  #fde68a;
+  --blue:    #93c5fd;
+  --tab-h:   72px;
+  --header-h: 64px;
+  --radius:  14px;
+  --radius-s: 8px;
+  --safe-b:  env(safe-area-inset-bottom, 0px);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+  -webkit-tap-highlight-color: transparent;
+  overflow: hidden;
+}
+
+/* ── Layout ── */
+#app { display: flex; flex-direction: column; height: 100%; }
+
+#header {
+  height: var(--header-h);
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  flex-shrink: 0;
+  position: relative;
+  color: #fff;
+}
+#header::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 16px; right: 16px;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, var(--border) 0 6px, transparent 6px 12px);
+}
+
+.header-logo {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #fff;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.header-logo span { color: var(--accent); }
+
+.streak-badge {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.3);
+  border-radius: 20px; padding: 6px 14px;
+  font-size: 16px; font-weight: 700; color: #fff;
+}
+.streak-badge .fire { font-size: 20px; }
+
+#screens {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.screen {
+  position: absolute; inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px 16px calc(var(--tab-h) + var(--safe-b) + 16px);
+  display: none;
+}
+.screen.active { display: block; }
+
+#tabs {
+  height: calc(var(--tab-h) + var(--safe-b));
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  flex-shrink: 0;
+  padding-bottom: var(--safe-b);
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: var(--tab-h);
+  gap: 3px;
+  cursor: pointer;
+  color: rgba(255,255,255,.55);
+  transition: color .15s;
+  border: none;
+  background: none;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.tab.active { color: #fff; }
+.tab svg { width: 28px; height: 28px; flex-shrink: 0; }
+.tab span { font-size: 13px; font-weight: 600; }
+
+/* ── Cards & Typography ── */
+h2 { font-size: 26px; font-weight: 800; margin-bottom: 16px; }
+h3 { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.card-sm {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  color: var(--text3);
+  margin-bottom: 10px;
+}
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: none; border-radius: var(--radius-s);
+  padding: 15px 20px;
+  font-size: 17px; font-weight: 700;
+  cursor: pointer;
+  transition: opacity .15s, transform .1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active { opacity: .8; transform: scale(.97); }
+.btn-accent { background: var(--accent); color: #fff; }
+.btn-ghost { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+.btn-green { background: var(--green2); color: #fff; }
+.btn-danger { background: #7f1d1d; color: #fca5a5; border: 1px solid #991b1b; }
+.btn-full { width: 100%; }
+
+/* ── Quick actions grid ── */
+.quick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.quick-btn {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 10px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: background .15s, transform .1s;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 140px;
+}
+.quick-btn:active { background: var(--card2); transform: scale(.97); }
+.quick-btn .qb-icon { font-size: 52px; }
+.quick-btn .qb-label { font-size: 20px; font-weight: 800; color: var(--text); }
+.quick-btn .qb-sub { font-size: 13px; color: var(--text2); }
+
+/* ── Stats row ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.stat-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  padding: 10px 8px;
+  text-align: center;
+}
+.stat-box .val { font-size: 26px; font-weight: 800; color: var(--text); }
+.stat-box .lbl { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+/* ── Activity feed ── */
+.feed-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.feed-item:last-child { border-bottom: none; }
+.feed-icon { font-size: 30px; flex-shrink: 0; }
+.feed-info { flex: 1; min-width: 0; }
+.feed-title { font-size: 17px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.feed-sub { font-size: 14px; color: var(--text2); }
+.feed-meta { font-size: 14px; color: var(--text3); flex-shrink: 0; }
+
+/* ── Filter chips ── */
+.filters { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 14px; padding-bottom: 2px; scrollbar-width: none; }
+.filters::-webkit-scrollbar { display: none; }
+.chip {
+  display: inline-flex; align-items: center;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px; font-weight: 600;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text2);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s, color .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ── Exercise cards ── */
+.ex-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.ex-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.ex-header:active { background: var(--card2); }
+.ex-cat { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--accent); }
+.ex-name { font-size: 18px; font-weight: 700; }
+.ex-chevron { margin-left: auto; color: var(--text3); font-size: 18px; transition: transform .2s; }
+.ex-card.open .ex-chevron { transform: rotate(180deg); }
+.ex-body { display: none; padding: 0 16px 16px; }
+.ex-card.open .ex-body { display: block; }
+
+.video-wrap {
+  border-radius: var(--radius-s);
+  overflow: hidden;
+  margin-bottom: 12px;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px 16px;
+  text-align: center;
+}
+.video-wrap .yt-icon { font-size: 48px; }
+.video-wrap .yt-label { font-size: 14px; color: #6b7280; }
+.video-wrap a {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #dc2626; color: #fff;
+  border-radius: 8px; padding: 10px 18px;
+  font-size: 15px; font-weight: 700;
+  text-decoration: none;
+}
+.video-wrap iframe {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  border: none;
+}
+
+.focus-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.focus-chip {
+  padding: 3px 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 11px;
+  color: var(--text2);
+}
+
+/* ── Timer ── */
+#timer-screen { text-align: center; }
+.timer-ring-wrap {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  margin: 20px auto;
+}
+#timer-svg { width: 220px; height: 220px; transform: rotate(-90deg); }
+#timer-track { fill: none; stroke: var(--bg3); stroke-width: 14; }
+#timer-arc { fill: none; stroke-width: 14; stroke-linecap: round; transition: stroke-dashoffset .5s linear, stroke .3s; }
+.timer-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px;
+}
+#timer-phase { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--text2); }
+#timer-time { font-size: 46px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -2px; }
+#timer-round { font-size: 12px; color: var(--text2); }
+
+.timer-settings { text-align: left; margin-bottom: 16px; }
+.setting-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.setting-row:last-child { border-bottom: none; }
+.setting-lbl { font-size: 14px; }
+.setting-ctrl { display: flex; align-items: center; gap: 10px; }
+.setting-ctrl button {
+  width: 30px; height: 30px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 50%; font-size: 18px; color: var(--text);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.setting-val { font-size: 15px; font-weight: 700; min-width: 48px; text-align: center; }
+
+.templates-row { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 16px; padding-bottom: 2px; scrollbar-width: none; }
+.templates-row::-webkit-scrollbar { display: none; }
+.tpl-btn {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-s); padding: 8px 14px;
+  font-size: 12px; font-weight: 600; color: var(--text2);
+  cursor: pointer; white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+.tpl-btn:active { background: var(--card2); }
+
+.timer-controls { display: flex; gap: 12px; justify-content: center; margin-top: 8px; }
+.ctrl-btn {
+  width: 56px; height: 56px; border-radius: 50%;
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  transition: transform .1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.ctrl-btn:active { transform: scale(.93); }
+.ctrl-play { background: var(--accent); color: #fff; width: 68px; height: 68px; font-size: 28px; }
+.ctrl-reset { background: var(--bg3); border: 1px solid var(--border); color: var(--text); }
+
+/* ── Matches ── */
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--text2); margin-bottom: 6px; display: block; }
+.form-input {
+  width: 100%;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  padding: 11px 14px;
+  font-size: 15px; color: var(--text);
+  outline: none;
+  transition: border-color .15s;
+}
+.form-input:focus { border-color: var(--accent); }
+.form-input::placeholder { color: var(--text3); }
+
+.result-toggle { display: flex; gap: 8px; }
+.result-opt {
+  flex: 1; padding: 10px;
+  border-radius: var(--radius-s);
+  border: 2px solid var(--border);
+  background: var(--bg3);
+  font-size: 14px; font-weight: 700;
+  cursor: pointer; text-align: center;
+  transition: all .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.result-opt.win.active { border-color: var(--green); background: rgba(52,211,153,.15); color: var(--green); }
+.result-opt.loss.active { border-color: #f87171; background: rgba(248,113,113,.15); color: #f87171; }
+
+.sets-list { margin-top: 8px; }
+.set-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.set-row .form-input { flex: 1; text-align: center; }
+.set-row .sep { font-size: 18px; font-weight: 800; color: var(--text3); }
+.set-row .del-set {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text3); font-size: 16px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+
+/* rating chart */
+#rating-canvas {
+  width: 100%;
+  height: 180px;
+  display: block;
+}
+
+.match-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.match-item:last-child { border-bottom: none; }
+.match-result-badge {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800; flex-shrink: 0;
+}
+.match-result-badge.win { background: rgba(52,211,153,.2); color: var(--green); }
+.match-result-badge.loss { background: rgba(248,113,113,.15); color: #f87171; }
+.match-info { flex: 1; min-width: 0; }
+.match-opp { font-size: 14px; font-weight: 700; }
+.match-meta { font-size: 12px; color: var(--text2); }
+.match-rating { text-align: right; flex-shrink: 0; }
+.match-r-after { font-size: 16px; font-weight: 800; }
+.match-r-delta { font-size: 11px; }
+.match-r-delta.up { color: var(--green); }
+.match-r-delta.dn { color: #f87171; }
+.match-r-delta.eq { color: var(--text3); }
+.del-btn { background: none; border: none; color: var(--text3); font-size: 20px; cursor: pointer; padding: 4px; -webkit-tap-highlight-color: transparent; }
+
+/* ── Progress charts ── */
+.progress-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.p-stat { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-s); padding: 14px 10px; text-align: center; }
+.p-stat .val { font-size: 32px; font-weight: 800; }
+.p-stat .lbl { font-size: 13px; color: var(--text2); margin-top: 2px; }
+
+#bar-canvas { width: 100%; height: 140px; display: block; }
+
+.balance-row { display: flex; gap: 10px; align-items: center; margin: 8px 0; }
+.balance-label { font-size: 12px; color: var(--text2); width: 60px; }
+.balance-bar-wrap { flex: 1; height: 10px; background: var(--bg3); border-radius: 5px; overflow: hidden; }
+.balance-bar { height: 100%; border-radius: 5px; }
+
+/* ── RTTF info card ── */
+.rttf-card {
+  background: linear-gradient(135deg, var(--bg3) 0%, var(--card) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 14px;
+}
+.rttf-icon { font-size: 48px; flex-shrink: 0; }
+.rttf-info { flex: 1; }
+.rttf-title { font-size: 16px; color: var(--text2); }
+.rttf-rating { font-size: 38px; font-weight: 800; }
+.rttf-link {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 12px; color: var(--accent);
+  text-decoration: none;
+}
+
+/* ── Toast ── */
+#toast {
+  position: fixed;
+  bottom: calc(var(--tab-h) + var(--safe-b) + 14px);
+  left: 50%; transform: translateX(-50%) translateY(20px);
+  background: #1e293b; color: var(--text);
+  padding: 10px 18px; border-radius: 20px;
+  font-size: 14px; font-weight: 600;
+  white-space: nowrap;
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s, transform .2s;
+  z-index: 100;
+  border: 1px solid #334155;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── Modal ── */
+#modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.7);
+  display: flex; align-items: flex-end;
+  z-index: 50;
+  display: none;
+}
+#modal-overlay.open { display: flex; }
+#modal-box {
+  background: var(--bg2);
+  border-radius: 20px 20px 0 0;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  width: 100%;
+  padding: 20px 20px calc(20px + var(--safe-b));
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
+.modal-title { font-size: 18px; font-weight: 800; margin-bottom: 16px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Header -->
+  <div id="header">
+    <div class="streak-badge" style="visibility:hidden">🔥 0 дн.</div>
+    <div class="header-logo">ТопСпин</div>
+    <div class="streak-badge">
+      <span class="fire">🔥</span>
+      <span id="streak-val">0</span> дн.
+    </div>
+  </div>
+
+  <!-- Screens -->
+  <div id="screens">
+
+    <!-- HOME -->
+    <div class="screen active" id="screen-home">
+      <div class="section-title">Быстрые действия</div>
+      <div class="quick-grid">
+        <button class="quick-btn" onclick="goTo('tennis')">
+          <span class="qb-icon">🏓</span>
+          <span class="qb-label">Теннис</span>
+          <span class="qb-sub">Техника и упражнения</span>
+        </button>
+        <button class="quick-btn" onclick="goTo('fitness')">
+          <span class="qb-icon">💪</span>
+          <span class="qb-label">Фитнес</span>
+          <span class="qb-sub">Физподготовка</span>
+        </button>
+        <button class="quick-btn" onclick="goTo('timer')">
+          <span class="qb-icon">⏱️</span>
+          <span class="qb-label">Таймер</span>
+          <span class="qb-sub">Интервальная тренировка</span>
+        </button>
+        <button class="quick-btn" onclick="openMatchForm()">
+          <span class="qb-icon">🏆</span>
+          <span class="qb-label">Матч</span>
+          <span class="qb-sub">Записать результат</span>
+        </button>
+      </div>
+
+      <div class="section-title">Эта неделя</div>
+      <div class="stats-row" id="home-stats">
+        <div class="stat-box"><div class="val" id="h-workouts">0</div><div class="lbl">тренировок</div></div>
+        <div class="stat-box"><div class="val" id="h-minutes">0</div><div class="lbl">минут</div></div>
+        <div class="stat-box"><div class="val" id="h-matches">0</div><div class="lbl">матчей</div></div>
+        <div class="stat-box"><div class="val" id="h-winpct">—</div><div class="lbl">% побед</div></div>
+      </div>
+
+      <div class="section-title">Рейтинг RTTF</div>
+      <div class="rttf-card">
+        <span class="rttf-icon">🎖️</span>
+        <div class="rttf-info">
+          <div class="rttf-title">Текущий рейтинг</div>
+          <div class="rttf-rating" id="home-rating">—</div>
+        </div>
+        <a class="rttf-link" href="https://rttf.ru" target="_blank">
+          Открыть RTTF →
+        </a>
+      </div>
+
+      <div class="section-title">Последняя активность</div>
+      <div class="card" id="feed-container">
+        <div style="color:var(--text3);font-size:14px;text-align:center;padding:8px 0">Активности пока нет</div>
+      </div>
+    </div>
+
+    <!-- TENNIS -->
+    <div class="screen" id="screen-tennis">
+      <h2>Теннисные упражнения</h2>
+      <div class="filters" id="tennis-filters"></div>
+      <div id="tennis-list"></div>
+    </div>
+
+    <!-- FITNESS -->
+    <div class="screen" id="screen-fitness">
+      <h2>Фитнес</h2>
+      <div class="filters" id="fitness-filters"></div>
+      <div id="fitness-list"></div>
+    </div>
+
+    <!-- TIMER -->
+    <div class="screen" id="screen-timer">
+      <h2>Таймер</h2>
+      <div class="section-title">Шаблоны</div>
+      <div class="templates-row" id="tpl-row"></div>
+
+      <div class="card timer-settings" id="timer-settings-panel">
+        <div class="setting-row">
+          <span class="setting-lbl">Разминка</span>
+          <div class="setting-ctrl">
+            <button onclick="adjSetting('warmup',-30)">−</button>
+            <span class="setting-val" id="sv-warmup">2:00</span>
+            <button onclick="adjSetting('warmup',30)">+</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <span class="setting-lbl">Работа</span>
+          <div class="setting-ctrl">
+            <button onclick="adjSetting('work',-5)">−</button>
+            <span class="setting-val" id="sv-work">0:20</span>
+            <button onclick="adjSetting('work',5)">+</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <span class="setting-lbl">Отдых</span>
+          <div class="setting-ctrl">
+            <button onclick="adjSetting('rest',-5)">−</button>
+            <span class="setting-val" id="sv-rest">0:10</span>
+            <button onclick="adjSetting('rest',5)">+</button>
+          </div>
+        </div>
+        <div class="setting-row">
+          <span class="setting-lbl">Раундов</span>
+          <div class="setting-ctrl">
+            <button onclick="adjSetting('rounds',-1)">−</button>
+            <span class="setting-val" id="sv-rounds">8</span>
+            <button onclick="adjSetting('rounds',1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="timer-ring-wrap">
+        <svg id="timer-svg" viewBox="0 0 220 220">
+          <circle id="timer-track" cx="110" cy="110" r="96"/>
+          <circle id="timer-arc" cx="110" cy="110" r="96" stroke="#ff5722"/>
+        </svg>
+        <div class="timer-center">
+          <div id="timer-phase">Готов</div>
+          <div id="timer-time">00:00</div>
+          <div id="timer-round"></div>
+        </div>
+      </div>
+
+      <div class="timer-controls">
+        <button class="ctrl-btn ctrl-reset" onclick="timerReset()" title="Сброс">↺</button>
+        <button class="ctrl-btn ctrl-play" id="timer-play-btn" onclick="timerToggle()">▶</button>
+        <button class="ctrl-btn ctrl-reset" onclick="timerSkip()" title="Пропустить">⏭</button>
+      </div>
+    </div>
+
+    <!-- MATCHES -->
+    <div class="screen" id="screen-matches">
+      <h2>Матчи и рейтинг</h2>
+
+      <div class="card" style="margin-bottom:12px">
+        <canvas id="rating-canvas" height="180"></canvas>
+        <div id="rating-empty" style="text-align:center;color:var(--text3);font-size:13px;padding:40px 0;display:none">
+          Добавьте матчи с указанным рейтингом для отображения графика
+        </div>
+      </div>
+
+      <button class="btn btn-accent btn-full" onclick="openMatchForm()" style="margin-bottom:16px">
+        + Записать матч
+      </button>
+
+      <div class="section-title">История матчей</div>
+      <div class="card" id="matches-list">
+        <div style="color:var(--text3);font-size:14px;text-align:center;padding:8px 0">Матчей ещё нет</div>
+      </div>
+
+      <div class="card-sm" style="margin-top:8px; background: var(--bg3);">
+        <div style="font-size:12px;color:var(--text2);line-height:1.6">
+          ℹ️ Рейтинг заносится вручную. Данные берутся с&nbsp;
+          <a href="https://rttf.ru" target="_blank" style="color:var(--accent)">rttf.ru</a>
+          — сайт обновляет рейтинг раз в неделю.
+        </div>
+      </div>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="screen" id="screen-progress">
+      <h2>Прогресс</h2>
+
+      <div class="progress-stats" id="prog-stats">
+        <div class="p-stat"><div class="val" id="pr-total">0</div><div class="lbl">тренировок всего</div></div>
+        <div class="p-stat"><div class="val" id="pr-mins">0</div><div class="lbl">минут всего</div></div>
+        <div class="p-stat"><div class="val" id="pr-streak">0</div><div class="lbl">дней подряд</div></div>
+      </div>
+
+      <div class="section-title">Тренировки за 7 дней</div>
+      <div class="card" style="padding:16px 12px 8px">
+        <canvas id="bar-canvas" height="140"></canvas>
+      </div>
+
+      <div class="section-title" style="margin-top:16px">Баланс тренировок</div>
+      <div class="card">
+        <div class="balance-row">
+          <span class="balance-label" style="color:var(--accent)">Теннис</span>
+          <div class="balance-bar-wrap">
+            <div class="balance-bar" id="bal-tennis" style="background:var(--accent);width:50%"></div>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:var(--accent);width:36px;text-align:right" id="bal-tennis-pct">—</span>
+        </div>
+        <div class="balance-row">
+          <span class="balance-label" style="color:var(--green)">Фитнес</span>
+          <div class="balance-bar-wrap">
+            <div class="balance-bar" id="bal-fitness" style="background:var(--green);width:50%"></div>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:var(--green);width:36px;text-align:right" id="bal-fitness-pct">—</span>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:16px">Журнал тренировок</div>
+      <div class="card" id="journal-list">
+        <div style="color:var(--text3);font-size:14px;text-align:center;padding:8px 0">Тренировок ещё нет</div>
+      </div>
+
+      <button class="btn btn-danger btn-full" style="margin-top:16px" onclick="confirmReset()">
+        Сбросить все данные
+      </button>
+    </div>
+
+  </div><!-- /screens -->
+
+  <!-- Tabs -->
+  <div id="tabs">
+    <button class="tab active" data-tab="home" onclick="goTo('home')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <span>Главная</span>
+    </button>
+    <button class="tab" data-tab="tennis" onclick="goTo('tennis')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" fill="var(--bg)"/></svg>
+      <span>Теннис</span>
+    </button>
+    <button class="tab" data-tab="fitness" onclick="goTo('fitness')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29l-1.43-1.43z"/></svg>
+      <span>Фитнес</span>
+    </button>
+    <button class="tab" data-tab="timer" onclick="goTo('timer')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+      <span>Таймер</span>
+    </button>
+    <button class="tab" data-tab="matches" onclick="goTo('matches')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+      <span>Матчи</span>
+    </button>
+    <button class="tab" data-tab="progress" onclick="goTo('progress')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+      <span>Прогресс</span>
+    </button>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Modal -->
+<div id="modal-overlay" onclick="closeModal(event)">
+  <div id="modal-box">
+    <div class="modal-handle"></div>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════ */
+const DATA_KEY = 'topspin_app_data_v1';
+
+let appData = {
+  workouts: [],
+  matches: []
+};
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(DATA_KEY);
+    if (raw) appData = JSON.parse(raw);
+  } catch(e) { showToast('Ошибка загрузки данных'); }
+}
+
+function saveData() {
+  try {
+    localStorage.setItem(DATA_KEY, JSON.stringify(appData));
+  } catch(e) { showToast('Не удалось сохранить данные'); }
+}
+
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+/* ═══════════════════════════════════════════════
+   EXERCISE DATA
+═══════════════════════════════════════════════ */
+const TENNIS_EXERCISES = [
+  {
+    id: 't1', cat: 'Техника', name: 'Форхенд топспин',
+    video: 'pMoLBuFRqVM',
+    desc: 'Основной атакующий удар. Мяч берётся снизу-вверх с максимальным вращением. Контакт в верхней точке отскока.',
+    focus: ['Вращение корпуса', 'Контакт в верхней точке', 'Опускание ракетки перед ударом']
+  },
+  {
+    id: 't2', cat: 'Техника', name: 'Бэкхенд топспин',
+    video: 'YlZQN5wLU7g',
+    desc: 'Атака со стороны бэкхенда. Локоть близко к корпусу, предплечье разгибается в момент удара.',
+    focus: ['Движение предплечья', 'Фиксация запястья', 'Контакт сбоку-снизу']
+  },
+  {
+    id: 't3', cat: 'Подача', name: 'Подача с боковым вращением',
+    video: 'k0DFBFoIJrc',
+    desc: 'Короткая подача с боковым или нижним вращением. Бросок мяча вверх, контакт под/сбоку мяча при падении.',
+    focus: ['Скрытость момента контакта', 'Тонкость касания', 'Направление замаха']
+  },
+  {
+    id: 't4', cat: 'Передвижение', name: 'Шаг приставной + удар',
+    video: 'N_p-1J83Fus',
+    desc: 'Приставной шаг в сторону и возврат в центр после удара. Важно успеть занять позицию до отскока.',
+    focus: ['Лёгкий перенос веса', 'Быстрый возврат', 'Низкий центр тяжести']
+  },
+  {
+    id: 't5', cat: 'Техника', name: 'Контртопспин',
+    video: 'pCMn-TQVDDA',
+    desc: 'Атака по топспину соперника. Ракетка более закрытая, контакт более сверху, движение компактнее.',
+    focus: ['Закрытый угол ракетки', 'Быстрый укороченный удар', 'Чтение вращения']
+  },
+  {
+    id: 't6', cat: 'Серии', name: 'Схема 3+1 (серия ударов)',
+    video: 'HXmkNxhJNjc',
+    desc: '3 форхенда по диагонали, затем 1 по линии. Отрабатывает серию ударов с концовкой по неожиданному направлению.',
+    focus: ['Ритм серии', 'Переключение направления', 'Позиционирование']
+  }
+];
+
+const FITNESS_EXERCISES = [
+  {
+    id: 'f1', cat: 'Взрывная сила', name: 'Прыжковые приседания',
+    video: 'CVaEhXotL7M',
+    desc: 'Глубокое приседание с последующим взрывным прыжком. Развивает стартовую скорость и силу ног.',
+    focus: ['Мягкое приземление', 'Взрывной толчок', 'Полная амплитуда']
+  },
+  {
+    id: 'f2', cat: 'Ноги', name: 'Боковые перемещения',
+    video: 'dSdp7ymT3M4',
+    desc: 'Быстрые приставные шаги вправо-влево с касанием конуса/линии. Имитирует игровое движение.',
+    focus: ['Низкая стойка', 'Ширина шага', 'Первый шаг от центра']
+  },
+  {
+    id: 'f3', cat: 'Кор', name: 'Планка с ротацией',
+    video: 'B296mZDhrP4',
+    desc: 'Из позиции планки — поворот с подъёмом руки вверх. Тренирует стабилизаторы корпуса.',
+    focus: ['Неподвижные бёдра', 'Медленная ротация', 'Дыхание не задерживать']
+  },
+  {
+    id: 'f4', cat: 'Кор', name: 'Русский твист с весом',
+    video: 'wkD8rjkodUI',
+    desc: 'Сидя с поднятыми ногами, вращение корпуса с гантелью или медболом. Имитирует ротацию при ударе.',
+    focus: ['Скручивание, не качание', 'Зафиксированные ноги', 'Полная амплитуда']
+  },
+  {
+    id: 'f5', cat: 'Плечи', name: 'Упражнения с эспандером для плеча',
+    video: 'RxRoQFtNlzI',
+    desc: 'Внутренняя и внешняя ротация плечевого сустава с резиновой лентой. Профилактика травм плеча.',
+    focus: ['Малые веса', 'Чёткая амплитуда', 'Без боли']
+  },
+  {
+    id: 'f6', cat: 'Кардио', name: 'Берпи',
+    video: 'auBLPXO8Fww',
+    desc: 'Классический берпи: прыжок → упор лёжа → отжимание (опц.) → прыжок вверх. Развивает выносливость.',
+    focus: ['Ровная спина в планке', 'Максимальная высота прыжка', 'Темп по самочувствию']
+  }
+];
+
+const TIMER_TEMPLATES = [
+  { name: 'Теннис-серии', warmup: 120, work: 45, rest: 15, rounds: 10 },
+  { name: 'Табата',        warmup: 60,  work: 20, rest: 10, rounds: 8  },
+  { name: 'Силовая',       warmup: 120, work: 40, rest: 20, rounds: 5  },
+  { name: 'Выносливость',  warmup: 180, work: 60, rest: 20, rounds: 6  }
+];
+
+/* ═══════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════ */
+let currentTab = 'home';
+
+function goTo(tab) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.getElementById('screen-' + tab).classList.add('active');
+  currentTab = tab;
+  if (tab === 'home')     renderHome();
+  if (tab === 'matches')  { renderMatches(); drawRatingChart(); }
+  if (tab === 'progress') renderProgress();
+}
+
+/* ═══════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════ */
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* ═══════════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════════ */
+function openModal(html) {
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal-overlay')) {
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════════ */
+function fmtDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('ru-RU', { day:'numeric', month:'short' });
+}
+function fmtSecs(s) {
+  const m = Math.floor(s/60), ss = s%60;
+  return `${m}:${String(ss).padStart(2,'0')}`;
+}
+function today() { return new Date().toISOString().slice(0,10); }
+function startOfDay(iso) { return iso.slice(0,10); }
+
+function calcStreak() {
+  const days = new Set([...appData.workouts, ...appData.matches].map(x => startOfDay(x.date)));
+  let streak = 0;
+  const now = new Date();
+  for (let i=0; i<365; i++) {
+    const d = new Date(now); d.setDate(d.getDate()-i);
+    if (days.has(d.toISOString().slice(0,10))) streak++;
+    else if (i > 0) break;
+  }
+  return streak;
+}
+
+function getCurrentRating() {
+  const withRating = appData.matches.filter(m => m.ratingAfter);
+  if (!withRating.length) return null;
+  return withRating[withRating.length-1].ratingAfter;
+}
+
+/* ═══════════════════════════════════════════════
+   HOME
+═══════════════════════════════════════════════ */
+function renderHome() {
+  const streak = calcStreak();
+  document.getElementById('streak-val').textContent = streak;
+
+  // week stats
+  const now = new Date();
+  const weekStart = new Date(now); weekStart.setDate(now.getDate()-6); weekStart.setHours(0,0,0,0);
+  const wWorkouts = appData.workouts.filter(w => new Date(w.date) >= weekStart);
+  const wMatches  = appData.matches.filter(m => new Date(m.date) >= weekStart);
+  const wins = appData.matches.filter(m => m.result === 'win').length;
+  const total = appData.matches.length;
+
+  document.getElementById('h-workouts').textContent = wWorkouts.length;
+  document.getElementById('h-minutes').textContent = wWorkouts.reduce((s,w) => s + (w.duration||0), 0);
+  document.getElementById('h-matches').textContent = wMatches.length;
+  document.getElementById('h-winpct').textContent = total ? Math.round(wins/total*100)+'%' : '—';
+
+  // rating
+  const r = getCurrentRating();
+  document.getElementById('home-rating').textContent = r || '—';
+
+  // feed
+  const all = [
+    ...appData.workouts.map(w => ({...w, _type:'workout'})),
+    ...appData.matches.map(m => ({...m, _type:'match'}))
+  ].sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0,8);
+
+  const feed = document.getElementById('feed-container');
+  if (!all.length) {
+    feed.innerHTML = '<div style="color:var(--text3);font-size:14px;text-align:center;padding:8px 0">Активности пока нет</div>';
+    return;
+  }
+  feed.innerHTML = all.map(item => {
+    if (item._type === 'workout') {
+      const icon = item.type === 'tennis' ? '🏓' : item.type === 'fitness' ? '💪' : '⏱️';
+      const label = item.exerciseName || (item.type === 'timer' ? 'Таймер' : 'Тренировка');
+      const dur = item.duration ? `${item.duration} мин` : '';
+      return `<div class="feed-item">
+        <span class="feed-icon">${icon}</span>
+        <div class="feed-info">
+          <div class="feed-title">${label}</div>
+          <div class="feed-sub">${dur}</div>
+        </div>
+        <div class="feed-meta">${fmtDate(item.date)}</div>
+      </div>`;
+    } else {
+      const icon = item.result === 'win' ? '🏆' : '📋';
+      const score = item.sets && item.sets.length ? item.sets.map(s=>`${s.me}:${s.opp}`).join(', ') : '';
+      return `<div class="feed-item">
+        <span class="feed-icon">${icon}</span>
+        <div class="feed-info">
+          <div class="feed-title">${item.result === 'win' ? 'Победа' : 'Поражение'} vs ${item.opponent||'?'}</div>
+          <div class="feed-sub">${score}</div>
+        </div>
+        <div class="feed-meta">${fmtDate(item.date)}</div>
+      </div>`;
+    }
+  }).join('');
+}
+
+/* ═══════════════════════════════════════════════
+   EXERCISES (Tennis + Fitness)
+═══════════════════════════════════════════════ */
+function renderExercises(type, data, filterEl, listEl) {
+  const cats = ['Все', ...new Set(data.map(e=>e.cat))];
+  let activeFilter = 'Все';
+
+  const filterContainer = document.getElementById(filterEl);
+  const listContainer = document.getElementById(listEl);
+
+  function renderFilters() {
+    filterContainer.innerHTML = cats.map(c =>
+      `<div class="chip${c===activeFilter?' active':''}" onclick="setExFilter('${type}','${c}')">${c}</div>`
+    ).join('');
+  }
+
+  window[`setExFilter_${type}`] = function(cat) {
+    activeFilter = cat;
+    renderFilters();
+    renderList();
+  };
+  // expose globally for inline onclick
+  window['setExFilter'] = function(t, cat) { window[`setExFilter_${t}`](cat); };
+
+  function renderList() {
+    const filtered = activeFilter === 'Все' ? data : data.filter(e => e.cat === activeFilter);
+    listContainer.innerHTML = filtered.map(ex => `
+      <div class="ex-card" id="ex-${ex.id}">
+        <div class="ex-header" onclick="toggleEx('${ex.id}')">
+          <div>
+            <div class="ex-cat">${ex.cat}</div>
+            <div class="ex-name">${ex.name}</div>
+          </div>
+          <span class="ex-chevron">⌄</span>
+        </div>
+        <div class="ex-body">
+          <div class="video-wrap">
+            <span class="yt-icon">▶️</span>
+            <span class="yt-label">Видео-демонстрация техники</span>
+            <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(ex.name + ' техника настольный теннис')}" target="_blank">
+              Смотреть на YouTube
+            </a>
+          </div>
+          <p style="font-size:14px;color:var(--text2);margin-bottom:10px">${ex.desc}</p>
+          <div class="focus-chips">
+            ${ex.focus.map(f=>`<span class="focus-chip">${f}</span>`).join('')}
+          </div>
+          <button class="btn btn-green btn-full" onclick="logExercise('${ex.id}','${ex.name}','${type}')">
+            ✓ Отметить как выполнено
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  renderFilters();
+  renderList();
+}
+
+window.toggleEx = function(id) {
+  const card = document.getElementById('ex-'+id);
+  card.classList.toggle('open');
+};
+
+window.logExercise = function(id, name, type) {
+  appData.workouts.push({ id: genId(), type, date: new Date().toISOString(), exerciseId: id, exerciseName: name, duration: 0 });
+  saveData();
+  showToast(`✓ ${name} — выполнено!`);
+};
+
+/* ═══════════════════════════════════════════════
+   TIMER
+═══════════════════════════════════════════════ */
+let timerState = {
+  warmup: 120, work: 20, rest: 10, rounds: 8,
+  phase: 'idle', // idle|warmup|work|rest|done
+  remaining: 0,
+  currentRound: 0,
+  totalTime: 0,
+  running: false,
+  startTime: null,
+  interval: null,
+  phaseStart: null
+};
+
+const PHASE_COLORS = { warmup:'#fbbf24', work:'#ff5722', rest:'#34d399', done:'#60a5fa', idle:'#2b5239' };
+const PHASE_LABELS = { warmup:'Разминка', work:'Работа', rest:'Отдых', done:'Готово!', idle:'Готов' };
+
+const ARC_R = 96;
+const ARC_C = 2 * Math.PI * ARC_R;
+
+function timerUpdateDisplay() {
+  const arc = document.getElementById('timer-arc');
+  const phaseFull = timerState.phase === 'warmup' ? timerState.warmup
+    : timerState.phase === 'work' ? timerState.work
+    : timerState.phase === 'rest' ? timerState.rest : 1;
+  const pct = timerState.phase === 'idle' ? 0
+    : timerState.phase === 'done' ? 1
+    : timerState.remaining / phaseFull;
+  arc.style.strokeDasharray = ARC_C;
+  arc.style.strokeDashoffset = ARC_C * (1 - pct);
+  arc.style.stroke = PHASE_COLORS[timerState.phase] || '#ff5722';
+  document.getElementById('timer-phase').textContent = PHASE_LABELS[timerState.phase] || '';
+  document.getElementById('timer-time').textContent = timerState.phase === 'idle'
+    ? fmtSecs(timerState.work)
+    : fmtSecs(timerState.remaining);
+  document.getElementById('timer-round').textContent =
+    (timerState.phase === 'work' || timerState.phase === 'rest')
+      ? `Раунд ${timerState.currentRound} / ${timerState.rounds}` : '';
+  document.getElementById('timer-play-btn').textContent = timerState.running ? '⏸' : '▶';
+}
+
+function timerStart() {
+  if (timerState.phase === 'idle' || timerState.phase === 'done') {
+    timerState.phase = 'warmup';
+    timerState.remaining = timerState.warmup;
+    timerState.currentRound = 0;
+    timerState.totalTime = 0;
+    timerState.phaseStart = Date.now();
+  }
+  timerState.running = true;
+  timerState.interval = setInterval(timerTick, 250);
+  document.getElementById('timer-settings-panel').style.display = 'none';
+}
+
+function timerTick() {
+  if (!timerState.running) return;
+  timerState.remaining -= 0.25;
+  timerState.totalTime += 0.25;
+  if (timerState.remaining <= 0) timerNextPhase();
+  timerUpdateDisplay();
+}
+
+function timerNextPhase() {
+  beep();
+  if (timerState.phase === 'warmup') {
+    timerState.phase = 'work';
+    timerState.currentRound = 1;
+    timerState.remaining = timerState.work;
+  } else if (timerState.phase === 'work') {
+    timerState.phase = 'rest';
+    timerState.remaining = timerState.rest;
+  } else if (timerState.phase === 'rest') {
+    if (timerState.currentRound >= timerState.rounds) {
+      timerFinish();
+      return;
+    }
+    timerState.currentRound++;
+    timerState.phase = 'work';
+    timerState.remaining = timerState.work;
+  }
+}
+
+function timerFinish() {
+  clearInterval(timerState.interval);
+  timerState.running = false;
+  timerState.phase = 'done';
+  timerState.remaining = 0;
+  const mins = Math.round(timerState.totalTime / 60);
+  appData.workouts.push({
+    id: genId(), type: 'timer',
+    date: new Date().toISOString(),
+    exerciseName: 'Интервальная тренировка',
+    duration: mins
+  });
+  saveData();
+  showToast(`🎉 Тренировка завершена! ${mins} мин`);
+  document.getElementById('timer-settings-panel').style.display = '';
+  timerUpdateDisplay();
+}
+
+window.timerToggle = function() {
+  if (timerState.running) {
+    clearInterval(timerState.interval);
+    timerState.running = false;
+  } else {
+    timerStart();
+  }
+  timerUpdateDisplay();
+};
+
+window.timerReset = function() {
+  clearInterval(timerState.interval);
+  timerState.running = false;
+  timerState.phase = 'idle';
+  timerState.remaining = 0;
+  timerState.currentRound = 0;
+  document.getElementById('timer-settings-panel').style.display = '';
+  timerUpdateDisplay();
+};
+
+window.timerSkip = function() {
+  timerState.remaining = 0;
+};
+
+window.adjSetting = function(key, delta) {
+  const mins = { warmup: 30, work: 5, rest: 5 };
+  if (key === 'rounds') {
+    timerState.rounds = Math.max(1, Math.min(30, timerState.rounds + delta));
+    document.getElementById('sv-rounds').textContent = timerState.rounds;
+  } else {
+    const min = key === 'warmup' ? 30 : 5;
+    const max = key === 'warmup' ? 600 : 300;
+    timerState[key] = Math.max(min, Math.min(max, timerState[key] + delta));
+    document.getElementById('sv-' + key).textContent = fmtSecs(timerState[key]);
+  }
+  if (timerState.phase === 'idle') timerUpdateDisplay();
+};
+
+function applyTemplate(tpl) {
+  Object.assign(timerState, tpl);
+  timerReset();
+  ['warmup','work','rest'].forEach(k => {
+    document.getElementById('sv-'+k).textContent = fmtSecs(timerState[k]);
+  });
+  document.getElementById('sv-rounds').textContent = timerState.rounds;
+}
+
+function initTimerTemplates() {
+  const row = document.getElementById('tpl-row');
+  row.innerHTML = TIMER_TEMPLATES.map((t,i) =>
+    `<div class="tpl-btn" onclick="applyTemplate(TIMER_TEMPLATES[${i}])">${t.name}</div>`
+  ).join('');
+}
+
+// Sound via Web Audio
+let audioCtx;
+function beep() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+  } catch(e) {}
+}
+
+/* ═══════════════════════════════════════════════
+   MATCH FORM
+═══════════════════════════════════════════════ */
+window.openMatchForm = function(existingId) {
+  const lastRating = getCurrentRating();
+  const match = existingId ? appData.matches.find(m => m.id === existingId) : null;
+
+  const html = `
+    <div class="modal-title">${match ? 'Редактировать матч' : 'Записать матч'}</div>
+    <div class="form-group">
+      <label class="form-label">Соперник</label>
+      <input class="form-input" id="mf-opp" placeholder="Имя соперника" value="${match?.opponent||''}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Дата</label>
+      <input class="form-input" id="mf-date" type="date" value="${match?.date?.slice(0,10)||today()}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Турнир / площадка</label>
+      <input class="form-input" id="mf-venue" placeholder="Название турнира или зала" value="${match?.venue||''}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Результат</label>
+      <div class="result-toggle">
+        <div class="result-opt win ${(!match||match.result==='win')?'active':''}" id="ro-win" onclick="setResult('win')">Победа 🏆</div>
+        <div class="result-opt loss ${match?.result==='loss'?'active':''}" id="ro-loss" onclick="setResult('loss')">Поражение</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Счёт по партиям</label>
+      <div class="sets-list" id="sets-list">
+        ${(match?.sets||[{me:'',opp:''}]).map((s,i)=>setRowHtml(i,s.me,s.opp)).join('')}
+      </div>
+      <button class="btn btn-ghost" onclick="addSet()" style="margin-top:6px;font-size:13px;padding:8px 14px">+ Добавить партию</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Рейтинг до</label>
+      <input class="form-input" id="mf-rbefore" type="number" placeholder="Рейтинг до матча" value="${match?.ratingBefore||lastRating||''}">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Рейтинг после</label>
+      <input class="form-input" id="mf-rafter" type="number" placeholder="Рейтинг после матча" value="${match?.ratingAfter||''}">
+    </div>
+    <button class="btn btn-accent btn-full" onclick="saveMatch('${existingId||''}')" style="margin-top:8px">
+      ${match ? 'Сохранить' : 'Записать матч'}
+    </button>
+  `;
+  openModal(html);
+  window._matchResult = match?.result||'win';
+};
+
+function setRowHtml(i, me, opp) {
+  return `<div class="set-row" id="set-row-${i}">
+    <input class="form-input" placeholder="Вы" type="number" min="0" id="sr-me-${i}" value="${me}">
+    <span class="sep">:</span>
+    <input class="form-input" placeholder="Соперник" type="number" min="0" id="sr-opp-${i}" value="${opp}">
+    <button class="del-set" onclick="removeSet(${i})">✕</button>
+  </div>`;
+}
+
+window.setResult = function(r) {
+  window._matchResult = r;
+  document.getElementById('ro-win').classList.toggle('active', r==='win');
+  document.getElementById('ro-loss').classList.toggle('active', r==='loss');
+};
+
+let setCount = 1;
+window.addSet = function() {
+  const list = document.getElementById('sets-list');
+  const i = list.children.length;
+  const div = document.createElement('div');
+  div.innerHTML = setRowHtml(i,'','');
+  list.appendChild(div.firstElementChild);
+};
+window.removeSet = function(i) {
+  const row = document.getElementById('set-row-'+i);
+  if (row && document.getElementById('sets-list').children.length > 1) row.remove();
+};
+
+window.saveMatch = function(existingId) {
+  const opp = document.getElementById('mf-opp').value.trim();
+  if (!opp) { showToast('Введите имя соперника'); return; }
+
+  const setRows = document.getElementById('sets-list').querySelectorAll('.set-row');
+  const sets = [];
+  setRows.forEach((row, i) => {
+    const me = document.getElementById('sr-me-'+i)?.value;
+    const op = document.getElementById('sr-opp-'+i)?.value;
+    if (me !== '' || op !== '') sets.push({ me: parseInt(me)||0, opp: parseInt(op)||0 });
+  });
+
+  const match = {
+    id: existingId || genId(),
+    opponent: opp,
+    date: document.getElementById('mf-date').value || today(),
+    venue: document.getElementById('mf-venue').value.trim(),
+    result: window._matchResult || 'win',
+    sets,
+    ratingBefore: parseInt(document.getElementById('mf-rbefore').value)||null,
+    ratingAfter: parseInt(document.getElementById('mf-rafter').value)||null
+  };
+
+  if (existingId) {
+    const idx = appData.matches.findIndex(m => m.id === existingId);
+    if (idx >= 0) appData.matches[idx] = match;
+  } else {
+    appData.matches.push(match);
+  }
+  saveData();
+  closeModal();
+  showToast('Матч записан ✓');
+  if (currentTab === 'matches') { renderMatches(); drawRatingChart(); }
+  if (currentTab === 'home') renderHome();
+};
+
+/* ═══════════════════════════════════════════════
+   MATCHES SCREEN
+═══════════════════════════════════════════════ */
+function renderMatches() {
+  const list = document.getElementById('matches-list');
+  if (!appData.matches.length) {
+    list.innerHTML = '<div style="color:var(--text3);font-size:14px;text-align:center;padding:8px 0">Матчей ещё нет</div>';
+    return;
+  }
+  const sorted = [...appData.matches].sort((a,b) => new Date(b.date)-new Date(a.date));
+  list.innerHTML = sorted.map(m => {
+    const score = m.sets?.length ? m.sets.map(s=>`${s.me}:${s.opp}`).join(', ') : '';
+    const delta = (m.ratingAfter && m.ratingBefore) ? m.ratingAfter - m.ratingBefore : null;
+    const deltaHtml = delta === null ? '' :
+      `<div class="match-r-delta ${delta>0?'up':delta<0?'dn':'eq'}">${delta>0?'+':''}${delta}</div>`;
+    return `<div class="match-item">
+      <div class="match-result-badge ${m.result}">${m.result==='win'?'В':'П'}</div>
+      <div class="match-info">
+        <div class="match-opp">${m.opponent||'?'}</div>
+        <div class="match-meta">${fmtDate(m.date)}${m.venue?' · '+m.venue:''}${score?' · '+score:''}</div>
+      </div>
+      <div class="match-rating">
+        <div class="match-r-after">${m.ratingAfter||'—'}</div>
+        ${deltaHtml}
+      </div>
+      <button class="del-btn" onclick="deleteMatch('${m.id}')">⋯</button>
+    </div>`;
+  }).join('');
+}
+
+window.deleteMatch = function(id) {
+  if (!confirm('Удалить этот матч?')) return;
+  appData.matches = appData.matches.filter(m => m.id !== id);
+  saveData();
+  renderMatches();
+  drawRatingChart();
+  renderHome();
+  showToast('Матч удалён');
+};
+
+/* ═══════════════════════════════════════════════
+   RATING CHART
+═══════════════════════════════════════════════ */
+function drawRatingChart() {
+  const canvas = document.getElementById('rating-canvas');
+  const empty = document.getElementById('rating-empty');
+  const points = appData.matches
+    .filter(m => m.ratingAfter)
+    .sort((a,b) => new Date(a.date)-new Date(b.date))
+    .map(m => ({ date: fmtDate(m.date), r: m.ratingAfter }));
+
+  if (!points.length) {
+    canvas.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+  canvas.style.display = 'block';
+  empty.style.display = 'none';
+
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth || canvas.parentElement.offsetWidth || 320;
+  const H = 180;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const pad = { top:14, right:14, bottom:36, left:44 };
+  const cw = W - pad.left - pad.right;
+  const ch = H - pad.top - pad.bottom;
+
+  const vals = points.map(p => p.r);
+  const minV = Math.min(...vals) - 20;
+  const maxV = Math.max(...vals) + 20;
+  const rng = maxV - minV || 1;
+
+  function px(i) { return pad.left + (i / Math.max(points.length-1,1)) * cw; }
+  function py(v) { return pad.top + ch - ((v - minV) / rng) * ch; }
+
+  // grid
+  ctx.strokeStyle = '#2b5239';
+  ctx.lineWidth = 1;
+  const gridSteps = 4;
+  for (let i=0; i<=gridSteps; i++) {
+    const y = pad.top + (ch / gridSteps) * i;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left+cw, y); ctx.stroke();
+    const v = Math.round(maxV - ((maxV-minV)/gridSteps)*i);
+    ctx.fillStyle = '#5a8a6a'; ctx.font = '10px system-ui'; ctx.textAlign = 'right';
+    ctx.fillText(v, pad.left-4, y+3);
+  }
+
+  // gradient fill
+  const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top+ch);
+  grad.addColorStop(0, 'rgba(255,87,34,.35)');
+  grad.addColorStop(1, 'rgba(255,87,34,.02)');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.moveTo(px(0), py(points[0].r));
+  points.forEach((p,i) => ctx.lineTo(px(i), py(p.r)));
+  ctx.lineTo(px(points.length-1), pad.top+ch);
+  ctx.lineTo(px(0), pad.top+ch);
+  ctx.closePath(); ctx.fill();
+
+  // line
+  ctx.strokeStyle = '#ff5722'; ctx.lineWidth = 2.5; ctx.lineJoin = 'round';
+  ctx.beginPath();
+  points.forEach((p,i) => i===0 ? ctx.moveTo(px(i), py(p.r)) : ctx.lineTo(px(i), py(p.r)));
+  ctx.stroke();
+
+  // dots + labels
+  points.forEach((p,i) => {
+    const x = px(i), y = py(p.r);
+    ctx.fillStyle = '#ff5722';
+    ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
+    ctx.fillText(p.r, x, y - 8);
+    // date label
+    if (points.length <= 8 || i % Math.ceil(points.length/6) === 0 || i === points.length-1) {
+      ctx.fillStyle = '#5a8a6a'; ctx.font = '9px system-ui';
+      ctx.fillText(p.date, x, H - pad.bottom + 14);
+    }
+  });
+}
+
+/* ═══════════════════════════════════════════════
+   PROGRESS
+═══════════════════════════════════════════════ */
+function renderProgress() {
+  const total = appData.workouts.length;
+  const mins = appData.workouts.reduce((s,w)=>s+(w.duration||0),0);
+  const streak = calcStreak();
+  document.getElementById('pr-total').textContent = total;
+  document.getElementById('pr-mins').textContent = mins;
+  document.getElementById('pr-streak').textContent = streak;
+  document.getElementById('streak-val').textContent = streak;
+
+  drawBarChart();
+
+  const tennis = appData.workouts.filter(w=>w.type==='tennis').length;
+  const fitness = appData.workouts.filter(w=>w.type==='fitness').length;
+  const tot2 = tennis + fitness || 1;
+  const tp = Math.round(tennis/tot2*100);
+  const fp = Math.round(fitness/tot2*100);
+  document.getElementById('bal-tennis').style.width = tp+'%';
+  document.getElementById('bal-fitness').style.width = fp+'%';
+  document.getElementById('bal-tennis-pct').textContent = tp+'%';
+  document.getElementById('bal-fitness-pct').textContent = fp+'%';
+
+  renderJournal();
+}
+
+function drawBarChart() {
+  const canvas = document.getElementById('bar-canvas');
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth || canvas.parentElement.offsetWidth || 300;
+  const H = 140;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W+'px';
+  canvas.style.height = H+'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const days = [];
+  for (let i=6; i>=0; i--) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    days.push(d.toISOString().slice(0,10));
+  }
+
+  const counts = days.map(d => appData.workouts.filter(w=>w.date.startsWith(d)).length);
+  const maxC = Math.max(...counts, 1);
+  const pad = { top:8, right:6, bottom:28, left:6 };
+  const barW = (W - pad.left - pad.right) / 7 - 6;
+  const chartH = H - pad.top - pad.bottom;
+
+  const DAY_LABELS = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+
+  days.forEach((d, i) => {
+    const x = pad.left + i * ((W - pad.left - pad.right) / 7) + 3;
+    const barH = Math.max(2, (counts[i]/maxC) * chartH);
+    const y = pad.top + chartH - barH;
+
+    ctx.fillStyle = counts[i] > 0 ? 'rgba(255,87,34,.85)' : 'rgba(43,82,57,.6)';
+    const r = 5;
+    ctx.beginPath();
+    ctx.moveTo(x+r, y); ctx.lineTo(x+barW-r, y);
+    ctx.quadraticCurveTo(x+barW, y, x+barW, y+r);
+    ctx.lineTo(x+barW, y+barH); ctx.lineTo(x, y+barH); ctx.lineTo(x, y+r);
+    ctx.quadraticCurveTo(x, y, x+r, y);
+    ctx.closePath(); ctx.fill();
+
+    if (counts[i] > 0) {
+      ctx.fillStyle = '#fff'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center';
+      ctx.fillText(counts[i], x + barW/2, y - 3);
+    }
+
+    const dow = new Date(d).getDay();
+    ctx.fillStyle = d === today() ? '#ff5722' : '#5a8a6a';
+    ctx.font = d === today() ? 'bold 11px system-ui' : '11px system-ui';
+    ctx.fillText(DAY_LABELS[dow], x + barW/2, H - pad.bottom + 14);
+  });
+}
+
+function renderJournal() {
+  const list = document.getElementById('journal-list');
+  const sorted = [...appData.workouts].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if (!sorted.length) {
+    list.innerHTML = '<div style="color:var(--text3);font-size:14px;text-align:center;padding:8px 0">Тренировок ещё нет</div>';
+    return;
+  }
+  const icons = { tennis:'🏓', fitness:'💪', timer:'⏱️' };
+  list.innerHTML = sorted.map(w => `
+    <div class="feed-item">
+      <span class="feed-icon">${icons[w.type]||'🏋️'}</span>
+      <div class="feed-info">
+        <div class="feed-title">${w.exerciseName || 'Тренировка'}</div>
+        <div class="feed-sub">${w.duration ? w.duration+' мин' : ''}${w.duration && w.type?' · ':''}${w.type==='tennis'?'Теннис':w.type==='fitness'?'Фитнес':w.type==='timer'?'Таймер':''}</div>
+      </div>
+      <div class="feed-meta">${fmtDate(w.date)}</div>
+      <button class="del-btn" onclick="deleteWorkout('${w.id}')">✕</button>
+    </div>
+  `).join('');
+}
+
+window.deleteWorkout = function(id) {
+  appData.workouts = appData.workouts.filter(w => w.id !== id);
+  saveData();
+  renderProgress();
+  showToast('Запись удалена');
+};
+
+window.confirmReset = function() {
+  openModal(`
+    <div class="modal-title" style="color:#f87171">Сброс данных</div>
+    <p style="color:var(--text2);margin-bottom:20px">Все тренировки и матчи будут удалены без возможности восстановления.</p>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-ghost" style="flex:1" onclick="closeModal()">Отмена</button>
+      <button class="btn btn-danger" style="flex:1" onclick="resetAll()">Удалить всё</button>
+    </div>
+  `);
+};
+
+window.resetAll = function() {
+  appData = { workouts: [], matches: [] };
+  saveData();
+  closeModal();
+  renderHome();
+  showToast('Данные сброшены');
+};
+
+/* ═══════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════ */
+function init() {
+  loadData();
+  renderExercises('tennis', TENNIS_EXERCISES, 'tennis-filters', 'tennis-list');
+  renderExercises('fitness', FITNESS_EXERCISES, 'fitness-filters', 'fitness-list');
+  initTimerTemplates();
+  timerUpdateDisplay();
+  renderHome();
+
+  // expose template apply globally
+  window.TIMER_TEMPLATES = TIMER_TEMPLATES;
+  window.applyTemplate = applyTemplate;
+
+  // draw charts on window resize
+  window.addEventListener('resize', () => {
+    if (currentTab === 'matches') drawRatingChart();
+    if (currentTab === 'progress') drawBarChart();
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
