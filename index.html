@@ -575,11 +575,11 @@ h3 { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
       <div class="rttf-card">
         <span class="rttf-icon">🎖️</span>
         <div class="rttf-info">
-          <div class="rttf-title">Текущий рейтинг</div>
+          <div class="rttf-title">Корабаев Улан · RTTF</div>
           <div class="rttf-rating" id="home-rating">—</div>
         </div>
-        <a class="rttf-link" href="https://rttf.ru" target="_blank">
-          Открыть RTTF →
+        <a class="rttf-link" href="https://m.rttf.ru/players/183996" target="_blank">
+          Мой профиль →
         </a>
       </div>
 
@@ -686,7 +686,7 @@ h3 { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
       <div class="card-sm" style="margin-top:8px; background: var(--bg3);">
         <div style="font-size:12px;color:var(--text2);line-height:1.6">
           ℹ️ Рейтинг заносится вручную. Данные берутся с&nbsp;
-          <a href="https://rttf.ru" target="_blank" style="color:var(--accent)">rttf.ru</a>
+          <a href="https://m.rttf.ru/players/183996" target="_blank" style="color:var(--accent)">rttf.ru</a>
           — сайт обновляет рейтинг раз в неделю.
         </div>
       </div>
@@ -786,7 +786,8 @@ const DATA_KEY = 'topspin_app_data_v1';
 
 let appData = {
   workouts: [],
-  matches: []
+  matches: [],
+  rttfRating: 265
 };
 
 function loadData() {
@@ -960,7 +961,7 @@ function calcStreak() {
 
 function getCurrentRating() {
   const withRating = appData.matches.filter(m => m.ratingAfter);
-  if (!withRating.length) return null;
+  if (!withRating.length) return appData.rttfRating || null;
   return withRating[withRating.length-1].ratingAfter;
 }
 
