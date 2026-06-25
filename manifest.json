@@ -1,0 +1,19 @@
+{
+  "name": "ТопСпин",
+  "short_name": "ТопСпин",
+  "description": "Тренировки по настольному теннису и фитнесу",
+  "start_url": "/topspin-app/",
+  "scope": "/topspin-app/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#dc2626",
+  "theme_color": "#dc2626",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
